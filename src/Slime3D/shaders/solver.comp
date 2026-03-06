@@ -1,0 +1,313 @@
+﻿#version 430
+
+#pragma optimize(on)
+
+layout(local_size_x = {LocalSizeX}) in;
+
+struct ShaderConfig {
+    int particleCount;
+    float dt;
+    float sensorDist;
+    float t;
+    float randomization;
+    float fieldSize;
+    float cellSize;
+    float maxDist;
+    int speciesCount;
+    float velocity;
+    int trackedIdx;
+    float maxForce;
+    float torque_k;
+    int cellCount;
+    int totalCellCount;
+    float maxSteer;
+    float flow;
+    float attraction;
+    float freeTreshold;
+};
+
+struct Particle
+{
+   vec4 position;
+   vec4 velocity;
+   int species;
+   int flags;
+   int  cellIndex;
+   float xzAngle;
+   float yAngle;
+   int _pad0;
+   int _pad1;
+   int _pad2;
+   vec4 direction;
+};
+
+#define MAX_SPECIES_COUNT     6
+#define KEYPOINTS_COUNT       3
+#define FORCE_COUNT           (MAX_SPECIES_COUNT * MAX_SPECIES_COUNT * KEYPOINTS_COUNT)
+
+layout(std140, binding = 0) uniform ConfigBuffer {
+    ShaderConfig config;
+};
+
+layout(std430, binding = 1) readonly buffer InputBuffer
+{
+    Particle inParticles[];
+};
+
+layout(std430, binding = 2) writeonly buffer OutputBuffer
+{
+    Particle outParticles[];
+};
+
+layout(std430, binding = 4) readonly buffer ForceBuffer {
+    vec4 forces[];
+};
+
+layout(std430, binding = 5) writeonly buffer TrackingBuffer
+{
+    Particle tracked;
+};
+
+layout(std430, binding = 6) buffer CellCount {
+    uint cellCounts[];
+};
+
+layout(std430, binding = 7) buffer CellOffsets {
+    uint cellOffsets[];
+};
+
+layout(std430, binding = 8) buffer ParticleIndices {
+    uint particleIndices[];
+};
+
+uint hash(uint state)
+{
+    state ^= 2747636419u;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    return state;
+}
+
+float scaleToRange01(uint state)
+{
+    return state / 4294967295.0;
+}
+
+float get_random_float_01(Particle p, uint seed)
+{
+     uint random = hash(uint(p.position.y * config.fieldSize + p.position.x) + hash(gl_GlobalInvocationID.x + int(config.t) * seed));
+     float random01 = scaleToRange01(random);
+     return random01;
+}
+
+vec4 get_random_01_vec4(Particle p)
+{
+    float x = get_random_float_01(p, 100037);
+    float y = get_random_float_01(p, 2045);
+    float z = get_random_float_01(p, 31347);
+    return vec4(x,y,z,0);
+}
+
+void torus_pos(inout vec4 pos)
+{
+    if (pos.x >= config.fieldSize)
+        pos.x -= config.fieldSize;
+    else if (pos.x < 0)
+        pos.x += config.fieldSize;
+
+    if (pos.y >= config.fieldSize)
+        pos.y -= config.fieldSize;
+    else if (pos.y < 0)
+        pos.y += config.fieldSize;
+
+    if (pos.z >= config.fieldSize)
+        pos.z -= config.fieldSize;
+    else if (pos.z < 0)
+        pos.z += config.fieldSize;
+}
+
+void torus_dist(inout vec4 d)
+{
+    if (abs(d.x) > config.fieldSize / 2)
+        d.x -= config.fieldSize*sign(d.x);
+
+    if (abs(d.y) > config.fieldSize / 2)
+        d.y -= config.fieldSize*sign(d.y);
+
+    if (abs(d.z) > config.fieldSize / 2)
+        d.z -= config.fieldSize*sign(d.z);
+}
+
+float evaluateForceForOffset(uint offset, float dist)
+{
+    // Clamp distance to valid range
+    dist = clamp(dist, forces[offset].x, forces[offset+KEYPOINTS_COUNT-1].x);
+
+    // Find the segment [i, i+1] that contains dist
+    for (int i = 0; i < KEYPOINTS_COUNT-1; ++i)
+    {
+        float x0 = forces[offset+i].x;
+        float x1 = forces[offset+i + 1].x;
+
+        if (dist <= x1)
+        {
+            float t = (dist - x0) / (x1 - x0);
+            return mix(forces[offset+i].y, forces[offset+i + 1].y, t);
+        }
+    }
+
+    // Safety fallback (should never happen)
+    return 0.0;
+}
+
+vec4 compute_single_steer(vec4 sensorPos, Particle p, Particle other)
+{
+    vec4 d = other.position - sensorPos; 
+    torus_dist(d);
+    vec4 single_steer = vec4(0,0,0,0);
+    if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
+    {
+        float r2 = dot(d, d);
+        float r = sqrt(r2);
+        uint forceOffset = (p.species * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
+        float f = evaluateForceForOffset(forceOffset, r);
+        single_steer = f * d / r;
+    }
+
+    return single_steer;
+}
+
+void compute_single_flow_and_attr(Particle p, Particle other, out vec4 single_flow, out vec4 single_attr)
+{
+    single_flow = vec4(0,0,0,0);
+    single_attr = vec4(0,0,0,0);
+    if (p.species != other.species)
+        return;
+
+    vec4 d = other.position - p.position; 
+    torus_dist(d);
+    if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
+    {
+        float r2 = dot(d, d);
+        float r = sqrt(r2);
+
+        single_flow = other.direction / (1 + r2);
+        single_attr = d / ((1 + r2)*r);
+    }
+}
+
+int wrapCell(int c)
+{
+    return (c % config.cellCount + config.cellCount) % config.cellCount;
+}
+
+void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 steer, out vec4 flow, out vec4 attr)
+{
+    int cellCount2 = config.cellCount * config.cellCount;
+    int gridX = p.cellIndex % config.cellCount;
+    int gridY = (p.cellIndex / config.cellCount) % config.cellCount;
+    int gridZ = p.cellIndex / (cellCount2);
+    ivec3 main = ivec3(gridX, gridY, gridZ);
+
+    steer = vec4(0.0);
+    flow = vec4(0.0);
+    attr = vec4(0.0);
+    for (int dz = -1; dz <= 1; dz++)
+    for (int dy = -1; dy <= 1; dy++)
+    for (int dx = -1; dx <= 1; dx++)
+    {
+        ivec3 cell = main + ivec3(dx, dy, dz);
+        cell.x = wrapCell(cell.x);
+        cell.y = wrapCell(cell.y);
+        cell.z = wrapCell(cell.z);
+        uint cellIdx = cell.x +
+                       cell.y * config.cellCount +
+                       cell.z * cellCount2;
+        uint offset = cellOffsets[cellIdx];
+        uint count = cellCounts[cellIdx];
+        for(uint indiceIdx = offset; indiceIdx<offset + count; indiceIdx++)
+        {
+            uint otherIdx = particleIndices[indiceIdx];
+            if (idx != otherIdx)
+            {
+                 Particle other = inParticles[otherIdx];
+                 steer += compute_single_steer(sensorPos, p, other);
+
+                 vec4 single_flow;
+                 vec4 single_attr;
+                 compute_single_flow_and_attr(p, other, single_flow, single_attr);
+                 flow += single_flow;
+                 attr += single_attr;
+            }
+        }
+    }
+}
+
+void update_one(uint idx)
+{
+    Particle p = inParticles[idx];    
+    vec4 vel = p.velocity;
+    vec4 pos = p.position;
+    vec4 dir = p.direction;
+
+    //compute all forces
+    vec4 sensorPos = pos + config.sensorDist * dir;
+    vec4 steer;
+    vec4 flow;
+    vec4 attr;
+    compute_total_interactions(sensorPos, idx, p, steer, flow, attr);
+
+    //apply torque to the particle
+    vec3 d = dir.xyz;
+    vec3 a = steer.xyz;
+    vec3 a_perp = a - d * dot(d, a);
+
+    float mag_a = length(a_perp);
+    if (mag_a > config.maxSteer)
+        a_perp *= config.maxSteer / mag_a;
+
+    d = normalize(d + config.torque_k * a_perp * config.dt);
+    dir = vec4(d, 0);
+
+    //randomization
+    float randomization = config.randomization;
+    vec4 random = get_random_01_vec4(p);
+    dir += (random - 0.5) * randomization * config.dt;
+    dir = normalize(dir);
+
+    //integrate position
+    vel = dir * config.velocity;
+    pos += vel * config.dt;
+
+    //apply flow from the particles of the same species
+    pos += flow * config.flow;
+
+    //apply repulsion/attraction to the particles of the same species
+    pos += attr * config.attraction;
+
+    //prepare updated particle struct
+    torus_pos(pos);
+    p.direction = dir;
+    p.position = pos;
+    p.velocity = vel;
+    p.flags = 0;
+    if (config.trackedIdx > -1 && config.trackedIdx == idx)
+    {
+        p.flags = 1;
+        tracked = p;
+    }
+
+    outParticles[idx] = p;
+}
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >=0 && idx < config.particleCount) 
+    {
+        update_one(idx);
+    }
+}
