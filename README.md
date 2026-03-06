@@ -1,2 +1,3 @@
-# slime-3d
-Slime simulation in 3d
+# Slime simulation in 3d
+work in progress...
+
