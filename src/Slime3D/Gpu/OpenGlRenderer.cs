@@ -236,7 +236,7 @@ namespace Slime3D.Gpu
 
             if (TrackedIdx.HasValue)
             {
-                xzAngle += 0.002;
+                xzAngle -= 0.002;
 
                 var tracked = solverProgram.GetTrackedParticle();
                 var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera to back of tracked particle

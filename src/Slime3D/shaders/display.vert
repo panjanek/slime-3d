@@ -43,15 +43,28 @@ void main()
     gl_PointSize = paricleSize * scale / distance;
 
     const vec3 colors[] = vec3[](
-        vec3(1.0, 1.0, 0.2), // yellow   
-        vec3(0.2, 1.0, 1.0), // cyan
-
+        vec3(1.0, 0.2, 1.0), // magenta
         vec3(0.2, 1.0, 0.2), // green
         vec3(0.2, 0.2, 1.0), // blue
-        vec3(1.0, 0.2, 1.0), // magenta
         vec3(1.0, 0.2, 0.2), // red
-        vec3(1.0, 1.0, 0.2), // yellow        
+
+      
+        
+        vec3(1.0, 1.0, 0.2), // yellow     
+       
         vec3(0.2, 1.0, 1.0), // cyan
+        
+        
+        
+
+            
+
+
+
+        
+
+           
+        
         vec3(1.0, 1.0, 1.0), // white
         vec3(0.5, 0.5, 0.5)  // gray
     );
