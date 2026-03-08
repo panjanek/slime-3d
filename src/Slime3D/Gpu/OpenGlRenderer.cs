@@ -236,7 +236,7 @@ namespace Slime3D.Gpu
 
             if (TrackedIdx.HasValue)
             {
-                xzAngle -= 0.002;
+                xzAngle += 0.002;
 
                 var tracked = solverProgram.GetTrackedParticle();
                 var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera to back of tracked particle
@@ -370,6 +370,8 @@ namespace Slime3D.Gpu
             //mp4: ffmpeg -f image2 -framerate 60 -i rec/frame_%05d.png -r 60 -vcodec libx264 -preset veryslow -crf 12 -profile:v high -pix_fmt yuv420p out.mp4 -y
             //gif: ffmpeg -framerate 60 -ss 2 -i rec/frame_%05d.png -vf "select='not(mod(n,2))',setpts=N/FRAME_RATE/TB" -t 5 -r 20 simple2.gif
             //cut: ffmpeg -ss 35 -i move-full.mp4 -t 35 -c copy chase-1.mp4
+            //upscale perfect: ffmpeg -i slime3d-v2.mp4 -vf "scale=2560:1440:flags=lanczos" -c:v libsvtav1 -preset 6 -crf 28 -pix_fmt yuv420p -c:a copy slime3d-1440.mkv
+            //upscale reasonable: ffmpeg -i slime3d-v2.mp4 -vf "scale=2560:1440:flags=lanczos" -c:v libsvtav1 -preset 8 -crf 30 -pix_fmt yuv420p -c:a copy slime3d-1440-med.mkv
             var recDir = app.configWindow.recordDir?.ToString();
             if (!recFrameNr.HasValue && !string.IsNullOrWhiteSpace(recDir))
             {
