@@ -21,3 +21,8 @@ Sensitivity, forces and randomization can be configured.
 
 ## Patterns
 
+<p align="center"><img src="https://github.com/panjanek/slime-3d/blob/d195b8a4b4b0634dd80143f7949cd1c38a609ed3/captures/zoom.gif" /></p>
+
+<p align="center"><img src="https://github.com/panjanek/slime-3d/blob/d195b8a4b4b0634dd80143f7949cd1c38a609ed3/captures/follow.gif" /></p>
+
+<p align="center"><img src="https://github.com/panjanek/slime-3d/blob/d195b8a4b4b0634dd80143f7949cd1c38a609ed3/captures/screen.png" /></p>
