@@ -20,15 +20,15 @@ namespace Slime3D.Models
 
         public ShaderConfig config;
 
-        public float particleSize = 3000f;
+        public float particleSize = 500f;
 
-        public float particleSoftness = 3.0f;
+        public float particleSoftness = 0.1f;
 
         public float fogDensity = 0.0005f;
 
-        public float forwardMove = 0.15f;
+        public float forwardMove = 0.0f;
 
-        public int torusRepeats = 4;
+        public int torusRepeats = 1;
 
         [JsonIgnore]
         public Particle[] particles;
@@ -139,7 +139,8 @@ namespace Slime3D.Models
                 dir.Normalize();
                 particles[i].direction = dir;
 
-                /*
+                
+                
                 var center = new Vector4(config.fieldSize / 2, config.fieldSize / 2, config.fieldSize / 2, 0);
                 var radius = config.fieldSize / 2;
                 while ((particles[i].position - center).Length > radius)
@@ -148,7 +149,10 @@ namespace Slime3D.Models
 
                 var inward = center - particles[i].position;
                 inward.Normalize();
-                particles[i].direction = inward;*/
+                particles[i].direction = inward;
+                
+                particles[i].velocity = dir * (0.1f + rnd.NextSingle() * 2);
+
             }
         }
     }

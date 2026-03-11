@@ -113,7 +113,7 @@ namespace Slime3D.Gpu
                     Vector3 up = Vector3.Cross(right, forward.Xyz);
                     var trranslation = -right * delta.X + up * delta.Y;
                     center += new Vector4(trranslation.X, trranslation.Y, trranslation.Z, 0);
-                    center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
+                    //center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
                 }
 
             }, () => { });
@@ -134,7 +134,7 @@ namespace Slime3D.Gpu
                 {
                     //going forward/backward current camera direction
                     center += GetCameraDirection() * delta;
-                    center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
+                    //center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
                 }
             };
 
@@ -251,7 +251,7 @@ namespace Slime3D.Gpu
                 var cameraDir = GetCameraDirection();
                 cameraDir.Normalize();
                 center += app.simulation.forwardMove * cameraDir;
-                center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
+                //center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
             }
             
         }
