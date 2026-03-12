@@ -43,7 +43,7 @@ namespace Slime3D
             app = new Models_AppContext();
             app.mainWindow = this;
             app.simulation = new Simulation();
-            app.simulation.StartSimulation(5000, 2, 300);
+            app.simulation.StartSimulation(5000, 1, 300);
             app.renderer = new OpenGlRenderer(placeholder, app);
             app.configWindow = new ConfigWindow(app);
             app.configWindow.Show();

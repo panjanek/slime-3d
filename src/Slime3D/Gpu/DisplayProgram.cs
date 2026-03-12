@@ -18,8 +18,6 @@ namespace Slime3D.Gpu
 
         private int particleSizeLocation;
 
-        private int softnessLocation;
-
         private int fogDensityLocation;
 
         private int viewLocation;
@@ -35,8 +33,6 @@ namespace Slime3D.Gpu
             if (projLocation == -1) throw new Exception("Uniform 'projection' not found. Shader optimized it out?");
             particleSizeLocation = GL.GetUniformLocation(program, "paricleSize");
             if (particleSizeLocation == -1) throw new Exception("Uniform 'paricleSize' not found. Shader optimized it out?");
-            softnessLocation = GL.GetUniformLocation(program, "softness");
-            if (softnessLocation == -1) throw new Exception("Uniform 'softness' not found. Shader optimized it out?");
             fogDensityLocation = GL.GetUniformLocation(program, "fogDensity");
             if (fogDensityLocation == -1) throw new Exception("Uniform 'fogDensity' not found. Shader optimized it out?");
             viewLocation = GL.GetUniformLocation(program, "view");
@@ -77,16 +73,23 @@ namespace Slime3D.Gpu
                 GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
                 GL.UniformMatrix4(viewLocation, false, ref viewMatrix);
                 GL.Uniform1(particleSizeLocation, particleSize);
-                GL.Uniform1(softnessLocation, softness);
                 GL.Uniform1(fogDensityLocation, fogDensity);
                 var offset = torusOffset;
                 GL.Uniform4(torusOffsetLocation, ref offset);
 
+                GL.DrawArraysInstanced(
+                    PrimitiveType.Triangles,
+                    0,
+                    12,              // vertices per tetrahedron
+                    particlesCount   // number of particles
+                );
+                
+                /*
                 GL.DrawArrays(
                     PrimitiveType.Points,
                     0,
                     particlesCount
-                );
+                );*/
             }
         }
     }
