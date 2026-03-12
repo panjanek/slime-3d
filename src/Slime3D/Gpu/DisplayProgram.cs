@@ -42,6 +42,7 @@ namespace Slime3D.Gpu
 
             dummyVao = GL.GenVertexArray();
             GL.BindVertexArray(0);
+            GL.Enable(EnableCap.Multisample);
         }
 
         public void Run(Matrix4 projectionMatrix,
@@ -51,6 +52,8 @@ namespace Slime3D.Gpu
                        float fogDensity,
                        List<Vector4> torusOffsets)
         {
+            
+            /*
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.DepthMask(true);
@@ -64,7 +67,23 @@ namespace Slime3D.Gpu
             GL.BlendFunc(
                 BlendingFactor.SrcAlpha,
                 BlendingFactor.OneMinusSrcAlpha
+            );*/
+            
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+
+            GL.DepthMask(true);
+
+            GL.Clear(
+                ClearBufferMask.ColorBufferBit |
+                ClearBufferMask.DepthBufferBit
             );
+
+            GL.Disable(EnableCap.Blend);
+            
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+            GL.FrontFace(FrontFaceDirection.Ccw);
 
             foreach (var torusOffset in torusOffsets)
             {
@@ -81,16 +100,9 @@ namespace Slime3D.Gpu
                 GL.DrawArraysInstanced(
                     PrimitiveType.Triangles,
                     0,
-                    12,              // vertices per tetrahedron
-                    particlesCount   // number of particles
+                    12, // vertices per tetrahedron
+                    particlesCount // number of particles
                 );
-                
-                /*
-                GL.DrawArrays(
-                    PrimitiveType.Points,
-                    0,
-                    particlesCount
-                );*/
             }
         }
     }

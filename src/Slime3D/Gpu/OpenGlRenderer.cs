@@ -75,7 +75,8 @@ namespace Slime3D.Gpu
                 Profile = ContextProfile.Core,
                 Flags = ContextFlags.Default,
                 IsEventDriven = false,
-                DepthBits = 24
+                DepthBits = 24, 
+                NumberOfSamples = 4
             });
             glControl.Dock = DockStyle.Fill;
             host.Child = glControl;
