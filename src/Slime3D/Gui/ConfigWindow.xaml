@@ -232,14 +232,10 @@
 
                 <!-- particleSize -->
                 <TextBlock Grid.Row="16" Grid.Column="0" Text="Particle size ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Screen size of particle. Does not affect simulation"/>
-                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="30000" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" Tag="particleSize" VerticalAlignment="Center"/>
+                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.01" Maximum="10" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="particleSize" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="16" Grid.Column="2" Tag="particleSize"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
 
-                <!-- softness -->
-                <TextBlock Grid.Row="17" Grid.Column="0" Text="Particle softness ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual softness"/>
-                <Slider Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="50" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="particleSoftness" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="17" Grid.Column="2" Tag="particleSoftness"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 <!-- fogDensity -->
                 <TextBlock Grid.Row="18" Grid.Column="0" Text="Fog density ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual fog density"/>

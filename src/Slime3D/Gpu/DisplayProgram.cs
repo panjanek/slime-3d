@@ -48,7 +48,6 @@ namespace Slime3D.Gpu
                        Matrix4 viewMatrix,
                        int particlesCount, 
                        float particleSize, 
-                       float softness,
                        float fogDensity,
                        List<Vector4> torusOffsets)
         {
@@ -62,8 +61,10 @@ namespace Slime3D.Gpu
             GL.DepthMask(false);
 
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha,
-                         BlendingFactor.One);
+            GL.BlendFunc(
+                BlendingFactor.SrcAlpha,
+                BlendingFactor.OneMinusSrcAlpha
+            );
 
             foreach (var torusOffset in torusOffsets)
             {

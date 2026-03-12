@@ -58,7 +58,7 @@ void main()
     mat3 rot = mat3(right, up, dir);
 
     int triVertex = indices[gl_VertexID];
-    vec3 local = tetraVerts[triVertex] * 0.001;
+    vec3 local = tetraVerts[triVertex];
 
     vec3 worldPos = pos + rot * (local * paricleSize);
 

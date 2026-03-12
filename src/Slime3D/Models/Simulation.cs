@@ -20,9 +20,7 @@ namespace Slime3D.Models
 
         public ShaderConfig config;
 
-        public float particleSize = 500f;
-
-        public float particleSoftness = 0.1f;
+        public float particleSize = 0.5f;
 
         public float fogDensity = 0.0005f;
 

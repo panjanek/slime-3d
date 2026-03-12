@@ -304,7 +304,6 @@ namespace Slime3D.Gpu
                 GetViewMatrix(),
                 app.simulation.config.particleCount,
                 app.simulation.particleSize,
-                app.simulation.particleSoftness,
                 app.simulation.fogDensity,
                 torusOffsets);
             glControl.SwapBuffers();
