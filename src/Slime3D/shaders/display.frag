@@ -8,6 +8,6 @@ out vec4 outputColor;
 
 void main()
 {
-    float light = 0.25 + 0.75 * vLighting;
+    float light = 0.5 + 0.5 * vLighting;
     outputColor = vec4(vColor * light * vFadingAlpha, 1.0);
 }

@@ -276,7 +276,7 @@ void update_one(uint idx)
     float speed = length(vel);
     if (speed > 0.001)
     {
-        vel = normalize(vel) * clamp(speed, 0.01, config.maxSpeed);
+        vel = normalize(vel) * clamp(speed, 0.1, config.maxSpeed);
     }
     else
     {
