@@ -52,35 +52,15 @@ namespace Slime3D.Gpu
                        float fogDensity,
                        List<Vector4> torusOffsets)
         {
-            
-            /*
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.DepthMask(true);
-            GL.Clear(
-                ClearBufferMask.ColorBufferBit |
-                ClearBufferMask.DepthBufferBit
-            );
-            GL.DepthMask(false);
-
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(
-                BlendingFactor.SrcAlpha,
-                BlendingFactor.OneMinusSrcAlpha
-            );*/
-            
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Lequal);
-
-            GL.DepthMask(true);
-
             GL.Clear(
                 ClearBufferMask.ColorBufferBit |
                 ClearBufferMask.DepthBufferBit
             );
 
             GL.Disable(EnableCap.Blend);
-            
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Ccw);
