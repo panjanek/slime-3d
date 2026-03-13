@@ -105,7 +105,7 @@ namespace Slime3D.Gui
                 var offset = Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY);
                 for (int i = 0; i < Simulation.KeypointsCount; i++)
                     app.simulation.forces[offset + i] = forceGraph.Forces[i];
-                forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.maxForce);
+                forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.wallForce);
             };
 
             duplicationCombo.SelectionChanged += (s, e) => 
@@ -168,7 +168,7 @@ namespace Slime3D.Gui
                 forceMatrix.SelectedY = 0;
             }
 
-            forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.maxForce);
+            forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.wallForce);
             forceMatrix.UpdateSelection();
             UpdateGraph();
         }
@@ -177,7 +177,7 @@ namespace Slime3D.Gui
         {
             var offset = Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY);
             var forces = app.simulation.forces.Skip(offset).Take(Simulation.KeypointsCount).ToArray();
-            forceGraph.UpdateGraph(forces, app.simulation.config.maxDist, app.simulation.config.maxForce);
+            forceGraph.UpdateGraph(forces, app.simulation.config.maxDist, app.simulation.config.wallForce);
         }
 
         private void global_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -257,7 +257,7 @@ namespace Slime3D.Gui
         {
             foreach (var text in WpfUtil.FindVisualChildren<TextBlock>(this))
                     WpfUtil.UpdateTextBlockForSlider(this, text, app.simulation);
-            forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.maxForce);
+            forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.wallForce);
             UpdateGraph();
             forceMatrix.UpdateDots();
         }

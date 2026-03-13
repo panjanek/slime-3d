@@ -20,13 +20,13 @@ namespace Slime3D.Models
 
         public ShaderConfig config;
 
-        public float particleSize = 0.5f;
+        public float particleSize = 0.7f;
 
         public float fogDensity = 0.0005f;
 
         public float forwardMove = 0.0f;
 
-        public int torusRepeats = 1;
+        public int torusRepeats = 0;
 
         [JsonIgnore]
         public Particle[] particles;
@@ -113,7 +113,7 @@ namespace Slime3D.Models
 
         public void InitialOneForce(int i, int j, Random rnd)
         {
-            float m = config.maxForce;
+            float m = config.wallForce;
             if (i == j)
                 SetSimpleForce(i, j, 0.5f * m, 0);
             else if (i < j)

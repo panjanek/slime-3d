@@ -37,7 +37,7 @@ namespace Slime3D.Models
 
         [FieldOffset(40)] public int trackedIdx;
 
-        [FieldOffset(44)] public float maxForce = 15;
+        [FieldOffset(44)] public float wallForce = 10;
 
         [FieldOffset(48)] public float cohesionRadius = 30f;     //torque_k
 
