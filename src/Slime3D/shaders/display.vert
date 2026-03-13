@@ -43,6 +43,30 @@ int indices[12] = int[](
     1,3,2
 );
 
+vec3 hsv2rgb(vec3 c)
+{
+    vec3 p = abs(fract(c.xxx + vec3(0.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+vec3 directionToHSV(vec3 dir)
+{
+    float hue = atan(dir.x, dir.z) * (0.15915494) + 0.5;
+    float saturation = clamp(length(dir.xz), 0.3, 1.0);
+    float value = 0.6 + 0.4 * dir.y;
+
+    return vec3(hue, saturation, value);
+}
+
+vec3 directionToColor(vec3 dir)
+{
+    float hue = atan(dir.x, dir.z) * 0.15915494 + 0.5;
+    float saturation = clamp(length(dir.xz), 0.3, 1.0);
+    float value = 0.7 + 0.3 * dir.y;
+    vec3 hsv = vec3(hue, saturation, value);
+    return hsv2rgb(hsv);
+}
+
 void main()
 {
     vec3 lightDir = vec3(1,1,-1);
@@ -97,6 +121,9 @@ void main()
     );
 
     vColor = colors[tri % 8];
+    
+    vColor = directionToColor(p.direction.xyz);
+    
     vFadingAlpha = exp(-fogDensity * distance);
     
     //float viewTerm = clamp(dot(normalize(-viewPos.xyz), normal),0,1);

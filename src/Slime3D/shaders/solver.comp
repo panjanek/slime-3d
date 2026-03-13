@@ -172,6 +172,7 @@ vec4 compute_total_interactions(uint idx, Particle p)
 {
     vec4 separation = vec4(0);
     vec4 avgVelocity = vec4(0);
+    vec4 avgDirection = vec4(0);
     vec4 alignment = vec4(0);
     int alignCount = 0;
     vec4 center = vec4(0);
@@ -207,14 +208,19 @@ vec4 compute_total_interactions(uint idx, Particle p)
                  
                  vec4 diff = other.position - p.position;
                  torus_dist(diff);
+                 vec4 normalizedDiff = normalize(diff);
+
+                 if (dot(p.direction, -normalizedDiff) < -0.707) //if outside of vision cone - ignore 
+                     continue;
                  
                  float dist = length(diff);
                  if (dist < config.separationRadius && dist > 0.001)
-                    separation += -normalize(diff) / (dist);
+                    separation += -normalizedDiff / dist;
                     
                  if (dist < config.alignRadius)
                  {
                      avgVelocity += other.velocity;
+                     avgDirection += other.direction;
                      alignCount++;
                  }
                  
@@ -231,9 +237,11 @@ vec4 compute_total_interactions(uint idx, Particle p)
     
     if (alignCount > 0)
     {
-        avgVelocity /= alignCount;
-        if (length(avgVelocity) > 0)
-            alignment = normalize(avgVelocity) - p.direction;
+        avgDirection /= alignCount;
+        alignment = normalize(avgDirection) - p.direction;
+        //avgVelocity /= alignCount;
+        //if (length(avgVelocity) > 0)
+        //    alignment = normalize(avgVelocity) - p.direction;
     }
     
     if (centerCount > 0)
