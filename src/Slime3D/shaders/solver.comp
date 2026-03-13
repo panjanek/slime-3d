@@ -7,23 +7,23 @@ layout(local_size_x = {LocalSizeX}) in;
 struct ShaderConfig {
     int particleCount;
     float dt;
-    float sensorDist;
+    float separationRadius;
     float t;
     float randomization;
     float fieldSize;
     float cellSize;
     float maxDist;
     int speciesCount;
-    float velocity;
+    float alignRadius;
     int trackedIdx;
     float maxForce;
-    float torque_k;
+    float cohesionRadius;
     int cellCount;
     int totalCellCount;
-    float maxSteer;
-    float flow;
-    float attraction;
-    float freeTreshold;
+    float separationForce;
+    float alignForce;
+    float cohesionForce;
+    float maxSpeed;
 };
 
 struct Particle
@@ -170,10 +170,6 @@ int wrapCell(int c)
 
 vec4 compute_total_interactions(uint idx, Particle p)
 {
-    float r_sep = 5;
-    float r_align = 30;
-    float r_cohesion = 30;
-    
     vec4 separation = vec4(0);
     vec4 avgVelocity = vec4(0);
     vec4 alignment = vec4(0);
@@ -213,16 +209,16 @@ vec4 compute_total_interactions(uint idx, Particle p)
                  torus_dist(diff);
                  
                  float dist = length(diff);
-                 if (dist < r_sep && dist > 0.001)
+                 if (dist < config.separationRadius && dist > 0.001)
                     separation += -normalize(diff) / (dist);
                     
-                 if (dist < r_align)
+                 if (dist < config.alignRadius)
                  {
                      avgVelocity += other.velocity;
                      alignCount++;
                  }
                  
-                 if (dist < r_cohesion)
+                 if (dist < config.cohesionRadius)
                  {
                      center += other.position;
                      centerCount++;
@@ -246,14 +242,10 @@ vec4 compute_total_interactions(uint idx, Particle p)
         cohesion = normalize(center - p.position);
     }
     
-    float w_sep = 1.5;
-    float w_align = 1.0;
-    float w_cohesion = 0.8;
-    
     vec4 acc =
-          w_sep * separation +
-          w_align * alignment +
-          w_cohesion * cohesion;
+          config.separationForce * separation +
+          config.alignForce * alignment +
+          config.cohesionForce * cohesion;
           
     return acc;
 }
@@ -282,8 +274,14 @@ void update_one(uint idx)
     
     //clamp speed
     float speed = length(vel);
-    if (speed > 0)
-        vel = normalize(vel) * clamp(speed, 0.001, 10);
+    if (speed > 0.001)
+    {
+        vel = normalize(vel) * clamp(speed, 0.01, config.maxSpeed);
+    }
+    else
+    {
+        vel = get_random_01_vec4(p) - 0.5;
+    }
     
     //integrate position
     pos += vel * config.dt;

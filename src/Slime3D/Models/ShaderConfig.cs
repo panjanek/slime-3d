@@ -19,7 +19,7 @@ namespace Slime3D.Models
 
         [FieldOffset(4)] public float dt = 0.025f;
 
-        [FieldOffset(8)] public float sensorDist = 15f;
+        [FieldOffset(8)] public float separationRadius = 5f;  //sensorDist
 
         [FieldOffset(12)] public float t = 0;
 
@@ -33,24 +33,24 @@ namespace Slime3D.Models
 
         [FieldOffset(32)] public int speciesCount = 0;
 
-        [FieldOffset(36)] public float velocity = 15f;
+        [FieldOffset(36)] public float alignRadius = 30f;   //velocity
 
         [FieldOffset(40)] public int trackedIdx;
 
         [FieldOffset(44)] public float maxForce = 15;
 
-        [FieldOffset(48)] public float torque_k = 0.3f;
+        [FieldOffset(48)] public float cohesionRadius = 30f;     //torque_k
 
         [FieldOffset(52)] public int cellCount = 0;
 
         [FieldOffset(56)] public int totalCellCount = 0;
 
-        [FieldOffset(60)] public float maxSteer = 3f;
+        [FieldOffset(60)] public float separationForce = 1.5f;   //maxSteer
 
-        [FieldOffset(64)] public float flow = -0.1f;
+        [FieldOffset(64)] public float alignForce = 1.0f;             //flow
 
-        [FieldOffset(68)] public float attraction = -0.1f;
+        [FieldOffset(68)] public float cohesionForce = 0.8f;   //attraction
 
-        [FieldOffset(72)] public float freeThreshold = 1f;
+        [FieldOffset(72)] public float maxSpeed = 10f; //freeThreshold
     }
 }
