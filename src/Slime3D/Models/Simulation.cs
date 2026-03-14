@@ -61,9 +61,10 @@ namespace Slime3D.Models
                 var dir = new Vector4(rnd.NextSingle() * 2 - 1, rnd.NextSingle() * 2 - 1, rnd.NextSingle() * 2 - 1, 0);
                 dir.Normalize();
                 particles[i].direction = dir;
+                particles[i].velocity = dir * (10f + rnd.NextSingle() * 20);
 
                 
-                
+                /*
                 var center = new Vector4(config.fieldSize / 2, config.fieldSize / 2, config.fieldSize / 2, 0);
                 var radius = config.fieldSize / 2;
                 while ((particles[i].position - center).Length > radius)
@@ -75,6 +76,7 @@ namespace Slime3D.Models
                 particles[i].direction = inward;
                 
                 particles[i].velocity = dir * (1f + rnd.NextSingle() * 2);
+                */
 
             }
         }

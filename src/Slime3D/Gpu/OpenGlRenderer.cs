@@ -305,7 +305,8 @@ namespace Slime3D.Gpu
                 app.simulation.config.particleCount,
                 app.simulation.particleSize,
                 app.simulation.fogDensity,
-                app.simulation.config.fieldSize);
+                app.simulation.config.fieldSize,
+                app.configWindow.CubeVisible);
             glControl.SwapBuffers();
             frameCounter++;
             Capture();

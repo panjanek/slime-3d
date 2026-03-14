@@ -263,6 +263,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
+                    
+                    <CheckBox Name="cubeCheckbox" IsChecked="True">Cube</CheckBox>
                 </Grid>
             </Grid>
         </DockPanel>

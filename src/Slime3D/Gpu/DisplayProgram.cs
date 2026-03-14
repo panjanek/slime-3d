@@ -110,7 +110,8 @@ namespace Slime3D.Gpu
                        int particlesCount, 
                        float particleSize, 
                        float fogDensity,
-                       float fieldSize)
+                       float fieldSize,
+                       bool cubeVisible)
         {
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
@@ -140,10 +141,11 @@ namespace Slime3D.Gpu
                 particlesCount // number of particles
             );
 
-            DrawBox(projectionMatrix, viewMatrix, fieldSize);
+            if (cubeVisible)
+                DrawCube(projectionMatrix, viewMatrix, fieldSize);
         }
 
-        private void DrawBox(Matrix4 projectionMatrix, Matrix4 viewMatrix, float fieldSize)
+        private void DrawCube(Matrix4 projectionMatrix, Matrix4 viewMatrix, float fieldSize)
         {
             GL.UseProgram(cubeProgram);
 

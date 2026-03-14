@@ -28,6 +28,8 @@ namespace Slime3D.Gui
     {
         private Models_AppContext app;
 
+        public bool CubeVisible { get; private set; } = true;
+
         private bool updating;
 
         public string recordDir;
@@ -91,6 +93,8 @@ namespace Slime3D.Gui
                     }
                 }
             };
+
+            cubeCheckbox.Click += (sender, args) => { CubeVisible = cubeCheckbox.IsChecked == true; };
 
             KeyDown += (s, e) => app.mainWindow.MainWindow_KeyDown(s, e);
         }
