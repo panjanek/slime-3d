@@ -24,8 +24,6 @@ namespace Slime3D.Models
 
         public float forwardMove = 0.0f;
 
-        public int torusRepeats = 0;
-
         [JsonIgnore]
         public Particle[] particles;
 

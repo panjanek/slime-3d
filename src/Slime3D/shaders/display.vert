@@ -21,9 +21,8 @@ layout(std430, binding = 2) buffer OutputBuffer {
 
 uniform mat4 view;
 uniform mat4 projection;
-uniform float paricleSize;
+uniform float particleSize;
 uniform float fogDensity;
-uniform vec4 torusOffset;
 
 layout(location = 0) out vec3 vColor;
 layout(location = 1) out float vFadingAlpha;
@@ -73,7 +72,7 @@ void main()
     uint particleID = gl_InstanceID;
     Particle p = points[particleID];
 
-    vec3 pos = p.position.xyz + torusOffset.xyz;
+    vec3 pos = p.position.xyz;
     vec3 dir = normalize(p.direction.xyz);
 
     vec3 helper = abs(dir.y) > 0.99 ? vec3(1,0,0) : vec3(0,1,0);
@@ -89,9 +88,9 @@ void main()
     int i1 = indices[tri*3 + 1];
     int i2 = indices[tri*3 + 2];
 
-    vec3 v0 = rot * tetraVerts[i0] * paricleSize;
-    vec3 v1 = rot * tetraVerts[i1] * paricleSize;
-    vec3 v2 = rot * tetraVerts[i2] * paricleSize;
+    vec3 v0 = rot * tetraVerts[i0] * particleSize;
+    vec3 v1 = rot * tetraVerts[i1] * particleSize;
+    vec3 v2 = rot * tetraVerts[i2] * particleSize;
 
     vec3 normal = normalize(cross(v1 - v0, v2 - v0));
 

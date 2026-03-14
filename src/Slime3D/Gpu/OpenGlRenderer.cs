@@ -299,46 +299,17 @@ namespace Slime3D.Gpu
         private void GlControl_Paint(object? sender, PaintEventArgs e)
         {
             FollowTrackedParticle();
-            var torusOffsets = GetVisibleTorusOffsets();
             displayProgram.Run(
                 GetProjectionMatrix(),
                 GetViewMatrix(),
                 app.simulation.config.particleCount,
                 app.simulation.particleSize,
-                app.simulation.fogDensity,
-                torusOffsets);
+                app.simulation.fogDensity);
             glControl.SwapBuffers();
             frameCounter++;
             Capture();
         }
-
-        private List<Vector4> GetVisibleTorusOffsets()
-        {
-            float S = app.simulation.config.fieldSize;
-            float radius = 0.5f * MathF.Sqrt(3 * S * S);
-            Vector3 localCenter = new Vector3(S, S, S) * 0.5f;
-            Vector3 camPos = center.Xyz;
-            Vector3 camDir = GetCameraDirection().Xyz;
-
-            var repeats = app.simulation.torusRepeats;
-            List<Vector4> torusOffsets = new List<Vector4>();
-            for (int tx = -repeats; tx <= repeats; tx++)
-                for (int ty = -repeats; ty <= repeats; ty++)
-                    for (int tz = -repeats; tz <= repeats; tz++)
-                    {
-                        var torusOffset = new Vector4(tx * S, ty * S, tz * S, 0);
-                        Vector3 repeatCenter = localCenter + torusOffset.Xyz;
-                        Vector3 toRepeat = repeatCenter - camPos;
-                        float forward = Vector3.Dot(toRepeat, camDir);
-                        if (forward < -radius)
-                            continue;
-
-                        torusOffsets.Add(torusOffset);
-                    }
-
-            return torusOffsets;
-        }
-
+        
         public void Step()
         {
             if (Application.Current.MainWindow == null || Application.Current.MainWindow.WindowState == System.Windows.WindowState.Minimized)

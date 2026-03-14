@@ -92,14 +92,6 @@ namespace Slime3D.Gui
                 }
             };
 
-            duplicationCombo.SelectionChanged += (s, e) => 
-            {
-                var str = WpfUtil.GetComboSelectionAsString(duplicationCombo);
-                if (int.TryParse(str, out var number))
-                    app.simulation.torusRepeats = number;
-                    
-            };
-
             KeyDown += (s, e) => app.mainWindow.MainWindow_KeyDown(s, e);
         }
 
