@@ -271,7 +271,7 @@ namespace Slime3D.Gpu
         {
             TrackedIdx = idx;
             app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-            solverProgram.Run(ref app.simulation.config, app.simulation.forces);
+            solverProgram.Run(ref app.simulation.config);
         }
 
         public void StopTracking()
@@ -280,7 +280,7 @@ namespace Slime3D.Gpu
             {
                 TrackedIdx = null;
                 app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-                solverProgram.Run(ref app.simulation.config, app.simulation.forces);
+                solverProgram.Run(ref app.simulation.config);
             }
         }
 
@@ -349,7 +349,7 @@ namespace Slime3D.Gpu
             {
                 app.simulation.config.trackedIdx = TrackedIdx ?? -1;
                 app.simulation.config.t += app.simulation.config.dt;
-                solverProgram.Run(ref app.simulation.config, app.simulation.forces);
+                solverProgram.Run(ref app.simulation.config);
             }
 
             var recDir = app.configWindow.recordDir?.ToString();

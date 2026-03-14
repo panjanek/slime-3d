@@ -24,8 +24,6 @@ namespace Slime3D.Gpu
 
         private int uboConfig;
 
-        private int forcesBuffer;
-
         private int pointsBufferA;
 
         private int pointsBufferB;
@@ -60,7 +58,6 @@ namespace Slime3D.Gpu
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
 
             //constant-length buffers
-            CreateBuffer(ref forcesBuffer, Simulation.MaxSpeciesCount * Simulation.MaxSpeciesCount * Simulation.KeypointsCount, Marshal.SizeOf<Vector4>());
             CreateBuffer(ref trackingBuffer, 1, Marshal.SizeOf<Particle>());
 
             GL.GetInteger((OpenTK.Graphics.OpenGL.GetIndexedPName)All.MaxComputeWorkGroupCount, 0, out maxGroupsX);
@@ -70,7 +67,7 @@ namespace Slime3D.Gpu
             tilingBinProgram = ShaderUtil.CompileAndLinkComputeShader("tiling_bin.comp");
         }
 
-        public void Run(ref ShaderConfig config, Vector4[] forces)
+        public void Run(ref ShaderConfig config)
         {
             PrepareBuffers(config.particleCount, config.totalCellCount);
             int dispatchGroupsX = (currentParticlesCount + ShaderUtil.LocalSizeX - 1) / ShaderUtil.LocalSizeX;
@@ -120,19 +117,13 @@ namespace Slime3D.Gpu
             GL.UseProgram(tilingBinProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
-
-
-            //DebugUtil.DebugSolver(false, config, this);
+            
             // ------------------------ run solver --------------------------
-            //upload forces
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, forcesBuffer);
-            GL.BufferSubData(BufferTarget.ShaderStorageBuffer, 0, Marshal.SizeOf<Vector4>() * Simulation.MaxSpeciesCount * Simulation.MaxSpeciesCount * Simulation.KeypointsCount, forces);
 
             //bind ubo and buffers
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, pointsBufferB);
-            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, forcesBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, trackingBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, cellCountBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, cellOffsetBuffer2);

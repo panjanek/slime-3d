@@ -39,10 +39,6 @@ namespace Slime3D.Gui
             minimizeButton.Click += (s, e) => WindowState = WindowState.Minimized;
             Closing += (s, e) => { e.Cancel = true; WindowState = WindowState.Minimized; };
             ContentRendered += (s, e) => { UpdateActiveControls(); UpdatePassiveControls(); };
-            forceMatrix.SelectionChanged = () =>
-            {
-                UpdateGraph();
-            };
             randomButton.PreviewKeyDown += (s, e) => e.Handled=true;
             restartButton.PreviewKeyDown += (s, e) => e.Handled = true;
             saveButton.PreviewKeyDown += (s, e) => e.Handled = true;
@@ -54,17 +50,14 @@ namespace Slime3D.Gui
             { 
                 app.simulation.InitializeParticles(app.simulation.config.particleCount);
                 app.renderer.UploadParticleData();
-                ResetMatrix();
             };
 
             randomButton.Click += (s, e) =>
             {
                 app.simulation.InitializeParticles(app.simulation.config.particleCount);
                 app.simulation.seed++;
-                app.simulation.InitializeForces();
                 app.renderer.UploadParticleData();
                 app.renderer.ResetOrigin();
-                ResetMatrix();
             };
 
             saveButton.Click += (s, e) =>
@@ -87,7 +80,6 @@ namespace Slime3D.Gui
                     var newSim = SimFactory.LoadFromFile(dialog.FileName);
                     app.simulation = newSim;
                     app.renderer.UploadParticleData();
-                    ResetMatrix();
                     UpdateActiveControls();
                     UpdatePassiveControls();
                     PopupMessage.Show(app.mainWindow, $"Config loaded from {dialog.FileName}");
@@ -98,14 +90,6 @@ namespace Slime3D.Gui
                         app.renderer.Paused = true;
                     }
                 }
-            };
-
-            forceGraph.Changed = () =>
-            {
-                var offset = Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY);
-                for (int i = 0; i < Simulation.KeypointsCount; i++)
-                    app.simulation.forces[offset + i] = forceGraph.Forces[i];
-                forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.wallForce);
             };
 
             duplicationCombo.SelectionChanged += (s, e) => 
@@ -119,31 +103,12 @@ namespace Slime3D.Gui
             KeyDown += (s, e) => app.mainWindow.MainWindow_KeyDown(s, e);
         }
 
-
-        private void Invert(int offset)
-        {  
-            for (int i = 1; i < Simulation.KeypointsCount; i++)
-                app.simulation.forces[offset + i].Y *= -1;
-            UpdateActiveControls();
-            UpdatePassiveControls();
-        }
-
-        private void CopyTo(int fromOffset, int toOffset)
-        {
-            if (fromOffset != toOffset)
-            {
-                for (int i = 0; i < Simulation.KeypointsCount; i++)
-                    app.simulation.forces[toOffset+i] = app.simulation.forces[fromOffset+i];
-                UpdateActiveControls();
-                UpdatePassiveControls();
-            }
-        }
-
         private void Record_Click(object sender, RoutedEventArgs e)
         {
             if (recordButton.IsChecked == true)
             {
-                var dialog = new CommonOpenFileDialog { IsFolderPicker = true, Title = "Select folder to save frames as PNG files" };
+                var dialog = new CommonOpenFileDialog
+                    { IsFolderPicker = true, Title = "Select folder to save frames as PNG files" };
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     app.renderer.Paused = false;
@@ -158,26 +123,6 @@ namespace Slime3D.Gui
             }
 
             e.Handled = true;
-        }
-
-        private void ResetMatrix()
-        {
-            if (forceMatrix.SelectedX >= app.simulation.config.speciesCount || forceMatrix.SelectedY >= app.simulation.config.speciesCount)
-            {
-                forceMatrix.SelectedX = 0;
-                forceMatrix.SelectedY = 0;
-            }
-
-            forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.wallForce);
-            forceMatrix.UpdateSelection();
-            UpdateGraph();
-        }
-
-        private void UpdateGraph()
-        {
-            var offset = Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY);
-            var forces = app.simulation.forces.Skip(offset).Take(Simulation.KeypointsCount).ToArray();
-            forceGraph.UpdateGraph(forces, app.simulation.config.maxDist, app.simulation.config.wallForce);
         }
 
         private void global_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -199,7 +144,6 @@ namespace Slime3D.Gui
                     {
                         app.simulation.StartSimulation(newParticleCount, newSpeciesCount, newSize);
                         app.renderer.UploadParticleData();
-                        ResetMatrix();
                         UpdateActiveControls();
                         UpdatePassiveControls();
                         if (app.renderer.Paused)
@@ -249,7 +193,6 @@ namespace Slime3D.Gui
                     slider.Value = ReflectionUtil.GetObjectValue<float>(app.simulation, tag);
                 }
             }
-            UpdateGraph();
             updating = false;
         }
 
@@ -257,9 +200,6 @@ namespace Slime3D.Gui
         {
             foreach (var text in WpfUtil.FindVisualChildren<TextBlock>(this))
                     WpfUtil.UpdateTextBlockForSlider(this, text, app.simulation);
-            forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.wallForce);
-            UpdateGraph();
-            forceMatrix.UpdateDots();
         }
     }
 }

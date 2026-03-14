@@ -16,8 +16,6 @@ namespace Slime3D.Models
     {
         public const int MaxSpeciesCount = 6;
 
-        public const int KeypointsCount = 3;
-
         public ShaderConfig config;
 
         public float particleSize = 0.7f;
@@ -31,34 +29,14 @@ namespace Slime3D.Models
         [JsonIgnore]
         public Particle[] particles;
 
-        [JsonIgnore]
-        public Vector4[] forces;
-
         public int seed = 11;
 
         public float followDistance = 75; 
-
-        //this is for json serialization
-        public float[][] F
-        {
-            get
-            {
-                var res = new float[forces.Length][];
-                for (int i = 0; i < forces.Length; i++)
-                    res[i] = [forces[i].X, forces[i].Y];
-                return res;
-            }
-            set
-            {
-                for (int i = 0; i < forces.Length; i++)
-                    forces[i] = new Vector4(value[i][0], value[i][1], 0, 0);
-            }
-        }
+        
 
         public Simulation()
         {
             config = new ShaderConfig();
-            forces = new Vector4[MaxSpeciesCount * MaxSpeciesCount * KeypointsCount];
         }
 
         public void StartSimulation(int particlesCount, int speciesCount, float size)
@@ -68,59 +46,8 @@ namespace Slime3D.Models
             config.fieldSize = size;
             config.particleCount = particlesCount;
             InitializeParticles(particlesCount);
-            var rnd = new Random(seed);
-            InitializeForces();
-            /*
-            if (speciesCount > previousSpeciesCount)
-            {
-                for(int i = previousSpeciesCount; i< speciesCount; i++)
-                {
-                    for (int j = 0; j < speciesCount; j++)
-                    {
-                        InitialOneForce(i, j, rnd);
-                    }
-                }
-            }*/
         }
-
-        public static int GetForceOffset(int specMe, int specOther)
-        {
-            int offset = (specMe * MaxSpeciesCount + specOther) * KeypointsCount;
-            return offset;
-
-        }
-
-        private void SetSimpleForce(int specMe, int specOther, float val0, float val1)
-        {
-            int offset = GetForceOffset(specMe, specOther);
-            var d = config.maxDist / KeypointsCount;
-            forces[offset + 0] = new Vector4(0 * d, val0, 0, 0);
-            forces[offset + 1] = new Vector4(1 * d, 0, 0, 0);
-            forces[offset + 2] = new Vector4(2 * d, val1, 0, 0);
-        }
-
-        public void InitializeForces()
-        {
-            var rnd = new Random(seed); //4
-            for (int i = 0; i < config.speciesCount; i++)
-            {
-                for (int j = 0; j < config.speciesCount; j++)
-                {
-                    InitialOneForce(i, j, rnd);
-                }
-            }
-        }
-
-        public void InitialOneForce(int i, int j, Random rnd)
-        {
-            float m = config.wallForce;
-            if (i == j)
-                SetSimpleForce(i, j, 0.5f * m, 0);
-            else if (i < j)
-                SetSimpleForce(i, j, -0.5f * m, 0);
-            else 
-                SetSimpleForce(i, j, 0.1f * m, 0);
-        }
+        
 
         public void InitializeParticles(int count)
         {
