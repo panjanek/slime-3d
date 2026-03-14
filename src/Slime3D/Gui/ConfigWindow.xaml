@@ -247,9 +247,9 @@
                 <Slider Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="20" SmallChange="0.1" LargeChange="2" ValueChanged="Slider_ValueChanged" Tag="config.wallForce" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="19" Grid.Column="2" Tag="config.wallForce"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- wallForce -->
+                <!-- fov -->
                 <TextBlock Grid.Row="20" Grid.Column="0" Text="fovDeg ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="fovDeg"/>
-                <Slider Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0" Maximum="360" SmallChange="1" LargeChange="2" ValueChanged="Slider_ValueChanged" Tag="config.fovDeg" VerticalAlignment="Center"/>
+                <Slider Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0" Maximum="180" SmallChange="1" LargeChange="2" ValueChanged="Slider_ValueChanged" Tag="config.fovDeg" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="20" Grid.Column="2" Tag="config.fovDeg"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
                 
                 <Grid Grid.Row="23" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">

@@ -57,6 +57,6 @@ namespace Slime3D.Models
         [FieldOffset(80)] public float alignRadius2;
         [FieldOffset(84)] public float cohesionRadius2;
         [FieldOffset(88)] public float fov = -0.707f;
-        [FieldOffset(92)] public float fovDeg = 270f;
+        [FieldOffset(92)] public float fovDeg = 135;
     }
 }

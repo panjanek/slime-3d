@@ -193,14 +193,15 @@ vec4 compute_total_interactions(uint idx, Particle p)
                  vec4 diff = other.position - p.position;
                  vec4 normalizedDiff = normalize(diff);
 
-                 if (dot(p.direction, -normalizedDiff) < config.fov) //if outside of vision cone - ignore 
+                 if (dot(p.direction, -normalizedDiff) < config.fov) 
                      continue;
                  
                  float r2 = dot(diff, diff);
                  if (r2 < config.separationRadius2 && r2 > 0.0001)
                  {
-                     float r = sqrt(r2);
-                     separation += -normalizedDiff / r;
+                     //float r = sqrt(r2);
+                     //separation += -normalizedDiff / r;
+                     separation -= diff / r2;
                  }
                     
                  if (r2 < config.alignRadius2)
@@ -222,13 +223,18 @@ vec4 compute_total_interactions(uint idx, Particle p)
     if (alignCount > 0)
     {
         avgDirection /= alignCount;
-        alignment = normalize(avgDirection) - p.direction;
+        float l = length(avgDirection);
+        if (l > 0.001)        
+            alignment = normalize(avgDirection) - p.direction;
     }
     
     if (centerCount > 0)
     {
         center /= centerCount;
-        cohesion = normalize(center - p.position);
+        vec3 d = (center - p.position).xyz;
+        float l = length(d);
+        if (l > 0.001)
+            cohesion = vec4(d / l, 0);
     }
     
     vec4 acc =
@@ -270,7 +276,11 @@ void update_one(uint idx)
 
     //prepare updated particle struct
     torus_pos(pos);
-    p.direction = normalize(vel);
+    
+    float vlen = length(vel);
+    if (vlen > 0.001)
+        p.direction = vel / vlen;    
+    //p.direction = normalize(vel);
     p.position = pos;
     p.velocity = vel;
     p.flags = 0;

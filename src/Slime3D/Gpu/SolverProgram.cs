@@ -80,7 +80,7 @@ namespace Slime3D.Gpu
             config.separationRadius2 = config.separationRadius * config.separationRadius;
             config.alignRadius2 =  config.alignRadius * config.alignRadius;
             config.cohesionRadius2 = config.cohesionRadius * config.cohesionRadius;
-            config.fov = (float)Math.Cos((Math.PI * config.fovDeg / 180) / 2);
+            config.fov = (float)Math.Cos((Math.PI * config.fovDeg / 180));
             PrepareBuffers(config.particleCount, config.totalCellCount);
 
             //upload config
