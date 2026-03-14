@@ -149,7 +149,7 @@ namespace Slime3D.Models
                 inward.Normalize();
                 particles[i].direction = inward;
                 
-                particles[i].velocity = dir * (0.1f + rnd.NextSingle() * 2);
+                particles[i].velocity = dir * (1f + rnd.NextSingle() * 2);
 
             }
         }

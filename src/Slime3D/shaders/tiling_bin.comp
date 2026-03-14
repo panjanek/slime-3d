@@ -24,6 +24,10 @@ struct ShaderConfig {
     float alignForce;
     float cohesionForce;
     float maxSpeed;
+    float separationRadius2;
+    float alignRadius2;
+    float cohesionRadius2;
+    float fov;    
 };
 
 struct Particle

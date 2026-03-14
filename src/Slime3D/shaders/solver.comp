@@ -24,6 +24,10 @@ struct ShaderConfig {
     float alignForce;
     float cohesionForce;
     float maxSpeed;
+    float separationRadius2;
+    float alignRadius2;
+    float cohesionRadius2;
+    float fov;
 };
 
 struct Particle
@@ -129,45 +133,6 @@ void torus_pos(inout vec4 pos)
         pos.z += config.fieldSize;
 }
 
-void torus_dist(inout vec4 d)
-{
-    if (abs(d.x) > config.fieldSize / 2)
-        d.x -= config.fieldSize*sign(d.x);
-
-    if (abs(d.y) > config.fieldSize / 2)
-        d.y -= config.fieldSize*sign(d.y);
-
-    if (abs(d.z) > config.fieldSize / 2)
-        d.z -= config.fieldSize*sign(d.z);
-}
-
-float evaluateForceForOffset(uint offset, float dist)
-{
-    // Clamp distance to valid range
-    dist = clamp(dist, forces[offset].x, forces[offset+KEYPOINTS_COUNT-1].x);
-
-    // Find the segment [i, i+1] that contains dist
-    for (int i = 0; i < KEYPOINTS_COUNT-1; ++i)
-    {
-        float x0 = forces[offset+i].x;
-        float x1 = forces[offset+i + 1].x;
-
-        if (dist <= x1)
-        {
-            float t = (dist - x0) / (x1 - x0);
-            return mix(forces[offset+i].y, forces[offset+i + 1].y, t);
-        }
-    }
-
-    // Safety fallback (should never happen)
-    return 0.0;
-}
-
-int wrapCell(int c)
-{
-    return (c % config.cellCount + config.cellCount) % config.cellCount;
-}
-
 vec4 compute_wall_force(vec4 pos)
 {
     float margin = config.fieldSize * 0.1;
@@ -214,9 +179,11 @@ vec4 compute_total_interactions(uint idx, Particle p)
     for (int dx = -1; dx <= 1; dx++)
     {
         ivec3 cell = main + ivec3(dx, dy, dz);
-        cell.x = wrapCell(cell.x);
-        cell.y = wrapCell(cell.y);
-        cell.z = wrapCell(cell.z);
+        if (cell.x < 0 || cell.x >= config.cellCount || 
+            cell.y < 0 || cell.y >= config.cellCount ||
+            cell.z < 0 || cell.z >= config.cellCount)
+            continue;
+        
         uint cellIdx = cell.x +
                        cell.y * config.cellCount +
                        cell.z * cellCount2;
@@ -231,30 +198,30 @@ vec4 compute_total_interactions(uint idx, Particle p)
                  Particle other = inParticles[otherIdx];
                  
                  vec4 diff = other.position - p.position;
-                 torus_dist(diff);
                  vec4 normalizedDiff = normalize(diff);
 
                  if (dot(p.direction, -normalizedDiff) < -0.707) //if outside of vision cone - ignore 
                      continue;
                  
-                 float dist = length(diff);
-                 if (dist < config.separationRadius && dist > 0.001)
-                    separation += -normalizedDiff / dist;
+                 float r2 = dot(diff, diff);
+                 if (r2 < config.separationRadius2 && r2 > 0.0001)
+                 {
+                     float r = sqrt(r2);
+                     separation += -normalizedDiff / r;
+                 }
                     
-                 if (dist < config.alignRadius)
+                 if (r2 < config.alignRadius2)
                  {
                      avgVelocity += other.velocity;
                      avgDirection += other.direction;
                      alignCount++;
                  }
                  
-                 if (dist < config.cohesionRadius)
+                 if (r2 < config.cohesionRadius2)
                  {
                      center += other.position;
                      centerCount++;
                  }
-                 
-
             }
         }
     }
@@ -263,9 +230,6 @@ vec4 compute_total_interactions(uint idx, Particle p)
     {
         avgDirection /= alignCount;
         alignment = normalize(avgDirection) - p.direction;
-        //avgVelocity /= alignCount;
-        //if (length(avgVelocity) > 0)
-        //    alignment = normalize(avgVelocity) - p.direction;
     }
     
     if (centerCount > 0)
@@ -298,10 +262,6 @@ void update_one(uint idx)
     
     //clamp speed
     float speed = length(vel);
-    vec3 desiredDir;
-    
-    // without turn rate limit
-    
     if (speed > 0.001)
     {
         vel = normalize(vel) * clamp(speed, 0.1, config.maxSpeed);
@@ -310,48 +270,6 @@ void update_one(uint idx)
     {
         vel = get_random_01_vec4(p) - 0.5;
     }
-    
-    
-    //with turn rate limit
-    /*
-    float maxTurnRate = 2.5;
-    if (speed > 0.001)
-    {
-        desiredDir = normalize(vel.xyz);
-        speed = clamp(speed, 0.1, config.maxSpeed);
-    }
-    else
-    {
-        desiredDir = normalize((get_random_01_vec4(p) - 0.5).xyz);
-        speed = 0.1;
-    }
-
-    float maxTurn = maxTurnRate * config.dt;
-    float d = clamp(dot(dir.xyz, desiredDir), -1.0, 1.0);
-    float angle = acos(d);
-    vec3 newDir;
-    if (angle > maxTurn)
-    {
-        float t = maxTurn / angle;
-        newDir = normalize(mix(dir.xyz, desiredDir, t));
-    }
-    else
-    {
-        newDir = desiredDir;
-    }
-
-    // rebuild velocity with limited direction
-    vel = vec4(newDir * speed, 0.0);
-    */
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     //integrate position
     pos += vel * config.dt;

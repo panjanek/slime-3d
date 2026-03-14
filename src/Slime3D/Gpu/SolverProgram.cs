@@ -80,6 +80,9 @@ namespace Slime3D.Gpu
             config.cellCount = (int)Math.Floor(config.fieldSize / config.maxDist);
             config.cellSize = config.fieldSize / config.cellCount;
             config.totalCellCount = config.cellCount * config.cellCount * config.cellCount;
+            config.separationRadius2 = config.separationRadius * config.separationRadius;
+            config.alignRadius2 =  config.alignRadius * config.alignRadius;
+            config.cohesionRadius2 = config.cohesionRadius * config.cohesionRadius;
             PrepareBuffers(config.particleCount, config.totalCellCount);
 
             //upload config
