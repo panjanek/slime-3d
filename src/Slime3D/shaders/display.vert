@@ -121,7 +121,10 @@ void main()
 
     vColor = colors[tri % 8];
     
-    vColor = directionToColor(p.direction.xyz);
+    vec3 colorSeed = p.direction.xyz;
+    colorSeed.x += triVertex*0.2;
+    colorSeed.y += (particleID % 10) * 0.03;
+    vColor = directionToColor(normalize(colorSeed));
     
     vFadingAlpha = exp(-fogDensity * distance);
     
