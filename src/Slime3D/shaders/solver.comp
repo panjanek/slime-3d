@@ -199,8 +199,6 @@ vec4 compute_total_interactions(uint idx, Particle p)
                  float r2 = dot(diff, diff);
                  if (r2 < config.separationRadius2 && r2 > 0.0001)
                  {
-                     //float r = sqrt(r2);
-                     //separation += -normalizedDiff / r;
                      separation -= diff / r2;
                  }
                     
