@@ -247,10 +247,15 @@
                 <Slider Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="20" SmallChange="0.1" LargeChange="2" ValueChanged="Slider_ValueChanged" Tag="config.wallForce" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="19" Grid.Column="2" Tag="config.wallForce"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
+                <!-- wallForce -->
+                <TextBlock Grid.Row="20" Grid.Column="0" Text="fovDeg ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="fovDeg"/>
+                <Slider Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0" Maximum="360" SmallChange="1" LargeChange="2" ValueChanged="Slider_ValueChanged" Tag="config.fovDeg" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="20" Grid.Column="2" Tag="config.fovDeg"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
                 
                 <!-- torus repeats -->
-                <TextBlock Grid.Row="20" Grid.Column="0" Text="Torus duplication" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
-                <ComboBox Name="duplicationCombo" Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,10,0">
+                <TextBlock Grid.Row="21" Grid.Column="0" Text="Torus duplication" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
+                <ComboBox Name="duplicationCombo" Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,10,0">
                     <ComboBoxItem>0</ComboBoxItem>
                     <ComboBoxItem>1</ComboBoxItem>
                     <ComboBoxItem>2</ComboBoxItem>

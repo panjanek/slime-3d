@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Slime3D.Models
 {
-    [StructLayout(LayoutKind.Explicit, Size = 92)]
+    [StructLayout(LayoutKind.Explicit, Size = 96)]
     public unsafe struct ShaderConfig
     {
         public ShaderConfig()
@@ -57,5 +57,6 @@ namespace Slime3D.Models
         [FieldOffset(80)] public float alignRadius2;
         [FieldOffset(84)] public float cohesionRadius2;
         [FieldOffset(88)] public float fov = -0.707f;
+        [FieldOffset(92)] public float fovDeg = 270f;
     }
 }

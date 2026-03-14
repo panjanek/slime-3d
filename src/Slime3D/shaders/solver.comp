@@ -28,6 +28,7 @@ struct ShaderConfig {
     float alignRadius2;
     float cohesionRadius2;
     float fov;
+    float fovDeg;
 };
 
 struct Particle
@@ -192,7 +193,7 @@ vec4 compute_total_interactions(uint idx, Particle p)
                  vec4 diff = other.position - p.position;
                  vec4 normalizedDiff = normalize(diff);
 
-                 if (dot(p.direction, -normalizedDiff) < -0.707) //if outside of vision cone - ignore 
+                 if (dot(p.direction, -normalizedDiff) < config.fov) //if outside of vision cone - ignore 
                      continue;
                  
                  float r2 = dot(diff, diff);

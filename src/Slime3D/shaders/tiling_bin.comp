@@ -28,6 +28,7 @@ struct ShaderConfig {
     float alignRadius2;
     float cohesionRadius2;
     float fov;    
+    float fovDeg;
 };
 
 struct Particle
