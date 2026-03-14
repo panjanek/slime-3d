@@ -265,6 +265,7 @@
                     </Grid.RowDefinitions>
                     
                     <CheckBox Name="cubeCheckbox" IsChecked="True">Cube</CheckBox>
+                    <CheckBox Grid.Column="1" Name="horizonCheckbox" IsChecked="True">Horizon</CheckBox>
                 </Grid>
             </Grid>
         </DockPanel>

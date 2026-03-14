@@ -29,6 +29,16 @@ namespace Slime3D.Gpu
         private int viewCubeLocation;
 
         private int fieldSizeCubeLocation;
+        
+        private int horizonProgram;
+        
+        private int projHorizonLocation;
+        
+        private int viewHorizonLocation;
+
+        private int fieldSizeHorizonLocation;
+
+        private int cameraPosHorizonLocation;
 
         private int dummyVao;
 
@@ -36,7 +46,11 @@ namespace Slime3D.Gpu
         
         private int cubeVbo;
         
-        float[] cubeLines =
+        private int groundVao;
+        
+        private int groundVbo;
+        
+        private float[] cubeLines =
         {
             // bottom square
             0,0,0,  1,0,0,
@@ -55,6 +69,17 @@ namespace Slime3D.Gpu
             1,0,0,  1,0,1,
             1,1,0,  1,1,1,
             0,1,0,  0,1,1
+        };
+        
+        private float[] groundVertices =
+        {
+            -1, 0, -1,
+            1, 0, -1,
+            1, 0,  1,
+
+            -1, 0, -1,
+            1, 0,  1,
+            -1, 0,  1
         };
 
         public DisplayProgram()
@@ -77,6 +102,17 @@ namespace Slime3D.Gpu
             fieldSizeCubeLocation = GL.GetUniformLocation(cubeProgram, "fieldSize");
             if (fieldSizeCubeLocation == -1) throw new Exception("Uniform 'fieldSize' not found. Shader optimized it out?");
             
+            horizonProgram = ShaderUtil.CompileAndLinkRenderShader("horizon.vert", "horizon.frag");
+            viewHorizonLocation = GL.GetUniformLocation(horizonProgram, "view");
+            if (viewHorizonLocation == -1) throw new Exception("Uniform 'view' not found. Shader optimized it out?");
+            projHorizonLocation = GL.GetUniformLocation(horizonProgram, "projection");
+            if (projHorizonLocation == -1) throw new Exception("Uniform 'projection' not found. Shader optimized it out?");
+            fieldSizeHorizonLocation = GL.GetUniformLocation(horizonProgram, "fieldSize");
+            if (fieldSizeHorizonLocation == -1) throw new Exception("Uniform 'fieldSize' not found. Shader optimized it out?");
+            cameraPosHorizonLocation = GL.GetUniformLocation(horizonProgram, "cameraPos");
+            if (fieldSizeHorizonLocation == -1) throw new Exception("Uniform 'cameraPos' not found. Shader optimized it out?");
+            
+            //boids
             dummyVao = GL.GenVertexArray();
             GL.BindVertexArray(0);
             GL.Enable(EnableCap.Multisample);
@@ -103,6 +139,31 @@ namespace Slime3D.Gpu
                 0);
 
             GL.BindVertexArray(0);
+            
+            // horizon
+            groundVao = GL.GenVertexArray();
+            GL.BindVertexArray(groundVao);
+            
+            groundVbo = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, groundVbo);
+
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                groundVertices.Length * sizeof(float),
+                groundVertices,
+                BufferUsageHint.StaticDraw);
+
+            GL.EnableVertexAttribArray(0);
+
+            GL.VertexAttribPointer(
+                0,
+                3,
+                VertexAttribPointerType.Float,
+                false,
+                3 * sizeof(float),
+                0);
+
+            GL.BindVertexArray(0);
         }
 
         public void Run(Matrix4 projectionMatrix,
@@ -111,7 +172,9 @@ namespace Slime3D.Gpu
                        float particleSize, 
                        float fogDensity,
                        float fieldSize,
-                       bool cubeVisible)
+                       bool cubeVisible,
+                       Vector3 cameraPos,
+                       bool horizonVisible)
         {
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
@@ -120,6 +183,11 @@ namespace Slime3D.Gpu
                 ClearBufferMask.ColorBufferBit |
                 ClearBufferMask.DepthBufferBit
             );
+            
+            if (horizonVisible)
+                GL.ClearColor(0.15f, 0.25f, 0.35f, 1);
+            else
+                GL.ClearColor(0,0,0,1);
 
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.CullFace);
@@ -143,6 +211,32 @@ namespace Slime3D.Gpu
 
             if (cubeVisible)
                 DrawCube(projectionMatrix, viewMatrix, fieldSize);
+
+            if (horizonVisible)
+                DrawHorizon(projectionMatrix, viewMatrix, fieldSize, cameraPos);
+        }
+
+        private void DrawHorizon(Matrix4 projectionMatrix, Matrix4 viewMatrix, float fieldSize, Vector3 cameraPos)
+        {
+            GL.UseProgram(horizonProgram);
+
+            GL.UniformMatrix4(viewHorizonLocation, false, ref viewMatrix);
+            GL.UniformMatrix4(projHorizonLocation, false, ref projectionMatrix);
+            GL.Uniform1(fieldSizeHorizonLocation, fieldSize);
+            GL.Uniform3(cameraPosHorizonLocation, cameraPos);
+
+            GL.BindVertexArray(groundVao);
+
+            GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.Blend);
+            GL.DepthMask(true);
+
+            GL.DrawArrays(
+                PrimitiveType.Triangles,
+                0,
+                6);
+
+            GL.BindVertexArray(0);
         }
 
         private void DrawCube(Matrix4 projectionMatrix, Matrix4 viewMatrix, float fieldSize)

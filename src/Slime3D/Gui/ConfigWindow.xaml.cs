@@ -29,6 +29,8 @@ namespace Slime3D.Gui
         private Models_AppContext app;
 
         public bool CubeVisible { get; private set; } = true;
+        
+        public bool HorizonVisible { get; private set; } = true;
 
         private bool updating;
 
@@ -95,6 +97,7 @@ namespace Slime3D.Gui
             };
 
             cubeCheckbox.Click += (sender, args) => { CubeVisible = cubeCheckbox.IsChecked == true; };
+            horizonCheckbox.Click += (sender, args) => { HorizonVisible = horizonCheckbox.IsChecked == true; };
 
             KeyDown += (s, e) => app.mainWindow.MainWindow_KeyDown(s, e);
         }
