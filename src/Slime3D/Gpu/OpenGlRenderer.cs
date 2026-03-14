@@ -260,9 +260,10 @@ namespace Slime3D.Gpu
         public void ResetOrigin()
         {
             StopTracking();
-            center = new Vector4(app.simulation.config.fieldSize / 2, app.simulation.config.fieldSize / 2, - app.simulation.config.fieldSize *0.5f, 1.0f);
-            xzAngle = 0;
-            yAngle = 0;
+            //center = new Vector4(app.simulation.config.fieldSize / 2, app.simulation.config.fieldSize / 2, - app.simulation.config.fieldSize *0.5f, 1.0f);
+            center = new Vector4(-app.simulation.config.fieldSize / 2, -app.simulation.config.fieldSize / 2, - app.simulation.config.fieldSize, 1.0f);
+            xzAngle = Math.PI * 0.25;
+            yAngle = Math.PI * 0.2;
         }
 
         public void UploadParticleData() => solverProgram.UploadParticles(app.simulation.particles);

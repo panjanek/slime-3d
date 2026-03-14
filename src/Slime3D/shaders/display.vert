@@ -109,8 +109,8 @@ void main()
     float distance = max(-viewPos.z, 0.001);
 
     const vec3 colors[] = vec3[](
-        vec3(0.0, 1.0, 0.0), // green
-        vec3(0.0, 0.0, 1.0), // blue
+        vec3(0.2, 1.0, 0.2), // green
+        vec3(0.2, 0.0, 1.0), // blue
         vec3(1.0, 0.2, 0.2), // red
         vec3(1.0, 0.2, 1.0), // magenta
         vec3(1.0, 1.0, 0.2), // yellow     
