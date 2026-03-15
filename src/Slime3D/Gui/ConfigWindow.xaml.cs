@@ -28,7 +28,7 @@ namespace Slime3D.Gui
     {
         private Models_AppContext app;
 
-        public bool CubeVisible { get; private set; } = true;
+        public bool CubeVisible { get; private set; } = false;
         
         public bool HorizonVisible { get; private set; } = true;
 

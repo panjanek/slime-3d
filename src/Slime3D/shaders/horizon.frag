@@ -16,10 +16,21 @@ void main()
     float dist = length(diff);
 
     float horizonFade = smoothstep(fieldSize * 1.2,
-                                   fieldSize * 10.0,
+                                   fieldSize * 5.0,
                                    dist);
+    
+    // ----- GRID -----
+    float gridScale = 30.0;
+    vec2 grid = fract(worldPos.xz / gridScale);
+    float gridSize = 0.03;
+    float lineX = step(grid.x, gridSize) + step(1.0 - grid.x, gridSize);
+    float lineZ = step(grid.y, gridSize) + step(1.0 - grid.y, gridSize);
+    float line = clamp(lineX + lineZ, 0.0, 1.0);
 
+
+    groundColor = mix(groundColor, vec3(0.05,0.1,0.05), line);
+    
     vec3 color = mix(groundColor, skyColor, horizonFade);
 
-    outputColor = vec4(color,horizonFade);
+    outputColor = vec4(color,1.0);
 }
