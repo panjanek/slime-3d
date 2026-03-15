@@ -48,21 +48,14 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
 }
 
-vec3 directionToHSV(vec3 dir)
-{
-    float hue = atan(dir.x, dir.z) * (0.15915494) + 0.5;
-    float saturation = clamp(length(dir.xz), 0.3, 1.0);
-    float value = 0.6 + 0.4 * dir.y;
-
-    return vec3(hue, saturation, value);
-}
-
 vec3 directionToColor(vec3 dir)
 {
-    float hue = atan(dir.x, dir.z) * 0.15915494 + 0.5;
-    float saturation = clamp(length(dir.xz), 0.3, 1.0);
-    float value = 0.7 + 0.3 * dir.y;
-    vec3 hsv = vec3(hue, saturation, value);
+    float azimuth = atan(dir.x, dir.z);
+    float elevation = asin(clamp(dir.y, -1.0, 1.0));
+    float h1 = azimuth * (1.0 / (2.0 * 3.14159265)) + 0.5;
+    float h2 = elevation * (1.0 / 3.14159265) + 0.5;
+    float hue = fract(h1 + 0.25 * dir.y);
+    vec3 hsv = vec3(hue, 1.0, 1.0);
     return hsv2rgb(hsv);
 }
 
