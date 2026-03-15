@@ -185,7 +185,7 @@ namespace Slime3D.Gpu
             );
             
             if (horizonVisible)
-                GL.ClearColor(0.15f, 0.25f, 0.35f, 1);
+                GL.ClearColor(0.15f, 0.25f, 0.45f, 1);
             else
                 GL.ClearColor(0,0,0,1);
 

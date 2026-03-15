@@ -8,7 +8,7 @@ out vec4 outputColor;
 
 void main()
 {
-    vec3 skyColor = vec3(0.15f, 0.25f, 0.35f);
+    vec3 skyColor = vec3(0.15f, 0.25f, 0.45f);
 
     float light = 0.5 + 0.5 * vLighting;
     vec3 objectColor = vColor * light;
