@@ -19,18 +19,29 @@ void main()
                                    fieldSize * 5.0,
                                    dist);
     
-    // ----- GRID -----
-    float gridScale = 30.0;
-    vec2 grid = fract(worldPos.xz / gridScale);
-    float gridSize = 0.03;
-    float lineX = step(grid.x, gridSize) + step(1.0 - grid.x, gridSize);
-    float lineZ = step(grid.y, gridSize) + step(1.0 - grid.y, gridSize);
-    float line = clamp(lineX + lineZ, 0.0, 1.0);
-
-
-    groundColor = mix(groundColor, vec3(0.05,0.1,0.05), line);
+    // ----- antialiased grid -----
+    float gridScale = 30.0;   // world units per cell
+    float lineWidth = 0.04;  // line thickness in grid units
     
-    vec3 color = mix(groundColor, skyColor, horizonFade);
+    vec2 coord = worldPos.xz / gridScale;
+    vec2 grid = fract(coord);
+    
+    // distance to nearest line along each axis
+    float dx = min(grid.x, 1.0 - grid.x);
+    float dz = min(grid.y, 1.0 - grid.y);
+    
+    // pixel footprint for AA
+    float ax = fwidth(coord.x);
+    float az = fwidth(coord.y);
+    
+    // anti-aliased lines
+    float lineX = 1.0 - smoothstep(lineWidth - ax, lineWidth + ax, dx);
+    float lineZ = 1.0 - smoothstep(lineWidth - az, lineWidth + az, dz);
+    
+    // combine
+    float line = max(lineX, lineZ);
 
+    groundColor = mix(groundColor, vec3(0.05,0.1,0.05), line); 
+    vec3 color = mix(groundColor, skyColor, horizonFade);
     outputColor = vec4(color,1.0);
 }

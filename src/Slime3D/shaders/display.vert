@@ -66,6 +66,15 @@ vec3 directionToColor(vec3 dir)
     return hsv2rgb(hsv);
 }
 
+float amplify(float x, int pow)
+{
+    float a = 1;
+    for(int i=0; i<pow; i++)
+        a = a * (1-x);
+
+    return 1-a;
+}
+
 void main()
 {
     vec3 lightDir = vec3(1,1,-1);
@@ -125,6 +134,11 @@ void main()
     colorSeed.x += triVertex*0.2;
     colorSeed.y += (particleID % 10) * 0.03;
     vColor = directionToColor(normalize(colorSeed));
+    
+    vColor.r = amplify(vColor.r, 2);
+    vColor.g = amplify(vColor.g, 2);
+    vColor.b = amplify(vColor.b, 2);
+
     
     vFadingAlpha = exp(-fogDensity * distance);
     

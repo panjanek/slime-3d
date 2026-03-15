@@ -239,7 +239,7 @@
                 
                 <!-- fogDensity -->
                 <TextBlock Grid.Row="18" Grid.Column="0" Text="Fog density ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual fog density"/>
-                <Slider Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="0.001" SmallChange="0.00001" LargeChange="0.0001" ValueChanged="Slider_ValueChanged" Tag="fogDensity" VerticalAlignment="Center"/>
+                <Slider Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="0.005" SmallChange="0.00001" LargeChange="0.0001" ValueChanged="Slider_ValueChanged" Tag="fogDensity" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="18" Grid.Column="2" Tag="fogDensity"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
                 
                 <!-- wallForce -->
