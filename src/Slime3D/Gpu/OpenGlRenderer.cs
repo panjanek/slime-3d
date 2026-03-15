@@ -60,6 +60,7 @@ namespace Slime3D.Gpu
 
         private int? recFrameNr;
 
+        private float targetDistance;
         public OpenGlRenderer(Panel placeholder, Models_AppContext app)
         {
             this.placeholder = placeholder;
@@ -94,6 +95,8 @@ namespace Slime3D.Gpu
             UploadParticleData();
             ResetOrigin();
 
+            targetDistance = app.simulation.followDistance;
+
             var dragging = new DraggingHandler(glControl, (mousePos, btn) => true, (prev, curr, btn) =>
             {
                 var delta = (curr - prev);
@@ -125,11 +128,15 @@ namespace Slime3D.Gpu
                 if (TrackedIdx.HasValue)
                 {
                     //change follow distance
-                    app.simulation.followDistance -= delta;
-                    if (app.simulation.followDistance < 10)
-                        app.simulation.followDistance = 10;
-                    app.configWindow.UpdateActiveControls();
-                    app.configWindow.UpdatePassiveControls();
+                    
+                    
+                    //app.simulation.followDistance -= delta;
+                    //if (app.simulation.followDistance < 10)
+                   //     app.simulation.followDistance = 10;
+                   
+                   targetDistance -= delta;
+                   if (targetDistance < 10)
+                       targetDistance = 10;
                 }
                 else
                 {
@@ -234,7 +241,7 @@ namespace Slime3D.Gpu
 
         private void FollowTrackedParticle()
         {
-
+            app.simulation.followDistance = 0.99f * app.simulation.followDistance + 0.01f * targetDistance;
             if (TrackedIdx.HasValue)
             {
                 xzAngle -= 0.002;
@@ -244,8 +251,9 @@ namespace Slime3D.Gpu
                 var delta = cameraPosition - center;
                 var translate = delta;
                 var newCenter = center + translate;
-                center = newCenter;
-                //do not correct torus then tracking not to interfere with fade. tracked.position will be torus corrected anyway
+                //center = newCenter;
+                //center = 0.95f * center + 0.05f * newCenter;
+                center = 0.95f * center + 0.05f * cameraPosition;
             }
             else
             {

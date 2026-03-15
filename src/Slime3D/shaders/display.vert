@@ -29,7 +29,7 @@ layout(location = 1) out float vFadingAlpha;
 layout(location = 2) out float vLighting;
 
 vec3 tetraVerts[4] = vec3[](
-    vec3(0.0, 0.0, 3.0),     // tip
+    vec3(0.0, 0.0, 4.0),     // tip
     vec3(-1.0, -1.0, -1.0),
     vec3( 1.0, -1.0, -1.0),
     vec3( 0.0,  1.0, -1.0)
@@ -80,6 +80,10 @@ void main()
     vec3 lightDir = vec3(1,1,-1);
     uint particleID = gl_InstanceID;
     Particle p = points[particleID];
+    
+    float sizeAmp = 1.0;
+    if (p.flags == 1)
+        sizeAmp = 1.5;
 
     vec3 pos = p.position.xyz;
     vec3 dir = normalize(p.direction.xyz);
@@ -97,9 +101,9 @@ void main()
     int i1 = indices[tri*3 + 1];
     int i2 = indices[tri*3 + 2];
 
-    vec3 v0 = rot * tetraVerts[i0] * particleSize;
-    vec3 v1 = rot * tetraVerts[i1] * particleSize;
-    vec3 v2 = rot * tetraVerts[i2] * particleSize;
+    vec3 v0 = rot * tetraVerts[i0] * particleSize * sizeAmp;
+    vec3 v1 = rot * tetraVerts[i1] * particleSize * sizeAmp;
+    vec3 v2 = rot * tetraVerts[i2] * particleSize * sizeAmp;
 
     vec3 normal = normalize(cross(v1 - v0, v2 - v0));
 
@@ -135,9 +139,16 @@ void main()
     colorSeed.y += (particleID % 10) * 0.03;
     vColor = directionToColor(normalize(colorSeed));
     
-    vColor.r = amplify(vColor.r, 2);
-    vColor.g = amplify(vColor.g, 2);
-    vColor.b = amplify(vColor.b, 2);
+    int amp = 2;
+    if (p.flags == 1)
+    {
+        vColor = vec3(1-vColor.r, 1-vColor.g, 1-vColor.b);
+        amp = 4;
+    }
+    
+    vColor.r = amplify(vColor.r, amp);
+    vColor.g = amplify(vColor.g, amp);
+    vColor.b = amplify(vColor.b, amp);
 
     
     vFadingAlpha = exp(-fogDensity * distance);
